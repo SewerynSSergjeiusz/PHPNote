@@ -3,10 +3,19 @@
  * Returns the list of cars.
  */
 require 'connect.php';
-    
-$notes = [];
-$sql = "SELECT id, title, note FROM notes";
+$postdata = file_get_contents("php://input");
+//var_dump($postdata);
+if(isset($postdata) && !empty($postdata))
+{
+	$request= json_decode($postdata);
+	if(trim($request->data) === '')
+	{
+		return http_response_code(400);
+	}
 
+$uid= mysqli_real_escape_string($con, trim($request->data));
+$notes = [];
+$sql = "SELECT notes.id, notes.title, notes.note, notes.user_id FROM `notes` WHERE notes.user_id='{$uid}'";
 if($result = mysqli_query($con,$sql))
 {
   $cr = 0;
@@ -15,6 +24,7 @@ if($result = mysqli_query($con,$sql))
     $notes[$cr]['id']    = $row['id'];
     $notes[$cr]['title'] = $row['title'];
     $notes[$cr]['note'] =  $row['note'];
+    $notes[$cr]['user_id']=$row['user_id'];
     $cr++;
   }
     
@@ -23,4 +33,5 @@ if($result = mysqli_query($con,$sql))
 else
 {
   http_response_code(404);
+}
 }

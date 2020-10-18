@@ -41,16 +41,26 @@ $sql->store_result();
 $sql->bind_result($uid, $uemail, $pw);
 
 if($sql->num_rows == 1){
+	
 	$sql->fetch();
 	if (password_verify($password, $pw)){
 		
-		 echo json_encode($uemail);
+		  echo json_encode(['data'=>$uid]);
+
+		 
 		}
-	}
+	
 	else
-	{
-		http_response_code(404);
+	{ 
+        http_response_code(404);
+	    echo json_encode(false);
 	}
+}
+else
+{
+	http_response_code(404);
+	echo json_encode(false);
+}
 }
 /*$sql = "SELECT id FROM users where email='$email' and password='$password'";
 if($result = mysqli_query($con,$sql))
